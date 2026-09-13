@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Life RPG — Dashboard</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <!-- Google Fonts: Inter & Sora -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      background-image:
+        linear-gradient(rgba(6,14,26,0.45), rgba(6,14,26,0.6)),
+        url('assets/dashboard-bg.png');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      background-repeat: no-repeat;
+    }
+
+    .ocean-bg {
+      display: none;
+    }
+
+    /* ── RPG XP & Attributes ──────────────────────────────── */
+    .xp-progression-card {
+      margin-bottom: 16px;
+    }
+    .xp-bar-track {
+      width: 100%;
+      height: 10px;
+      background: rgba(255,255,255,.08);
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .xp-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--teal), var(--teal-light));
+      border-radius: 6px;
+      box-shadow: 0 0 12px var(--teal-glow);
+      transition: width 0.6s cubic-bezier(.4,1.4,.6,1);
+    }
+    .home-row-attributes {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 768px) {
+      .home-row-attributes {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ocean Background -->
+  <div class="ocean-bg"></div>
+  <div class="ocean-rays" id="ocean-rays"></div>
+  <div class="ocean-bubbles" id="ocean-bubbles"></div>
+
+  <!-- App Layout -->
+  <div class="app-layout">
+
+    <!-- ═══ SIDEBAR ═══════════════════════════════════════ -->
+    <aside class="sidebar">
+
+      <!-- Logo -->
+      <div class="sidebar-logo">
+        <img src="assets/logo.png" alt="Life RPG" class="sidebar-logo-icon">
+        <div class="sidebar-logo-text">
+          <strong>Life RPG</strong>
+          <span>Small Steps · Big Changes</span>
+        </div>
+      </div>
+
+      <!-- Nav -->
+      <nav class="sidebar-nav" id="sidebar-nav">
+        <!-- Rendered by app.js -->
+      </nav>
+
+      <!-- Tagline -->
+      <div class="sidebar-tagline">
+        <p>Better<br>Habits<br>Brighter<br>You</p>
+        <span>~ 🌊 ~</span>
+      </div>
+
+    </aside>
+
+    <!-- ═══ MAIN COLUMN ════════════════════════════════════ -->
+    <div class="main-col">
+
+      <!-- ── Header ─────────────────────────────────────── -->
+      <header class="app-header">
+
+        <!-- Search -->
+        <div class="header-search">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="header-search-input" placeholder="Search habits, goals…">
+        </div>
+
+        <!-- Actions -->
+        <div class="header-actions">
+          <button class="header-btn" title="Notifications" onclick="App.toast('No new notifications', 'success')">
+            <i class="fa-solid fa-bell"></i>
+            <span class="dot"></span>
+          </button>
+          <button class="header-btn" title="Quick Add Habit" onclick="App.navigate('habits');setTimeout(()=>PageHabits.openAddModal(),400)">
+            <i class="fa-solid fa-plus"></i>
+          </button>
+
+          <!-- Profile -->
+          <div class="header-profile" onclick="App.navigate('settings')" title="Settings & Profile" style="padding: 2px;">
+            <div class="profile-avatar" id="header-avatar">
+              <span id="header-avatar-text">U</span>
+            </div>
+          </div>
+        </div>
+
+      </header>
+
+      <!-- ── Content ─────────────────────────────────────── -->
+      <main class="app-content">
+
+        <!-- HOME -->
+        <section class="page-section" id="content-home">
+          <div class="page-loader"><div class="loader-ring"></div></div>
+        </section>
+
+        <!-- MY HABITS -->
+        <section class="page-section" id="content-habits">
+          <div class="page-loader"><div class="loader-ring"></div></div>
+        </section>
+
+        <!-- CALENDAR -->
+        <section class="page-section" id="content-calendar">
+          <div class="page-loader"><div class="loader-ring"></div></div>
+        </section>
+
+        <!-- REWARDS -->
+        <section class="page-section" id="content-rewards">
+          <div class="page-loader"><div class="loader-ring"></div></div>
+        </section>
+
+        <!-- SHOP -->
+        <section class="page-section" id="content-shop">
+          <div class="page-loader"><div class="loader-ring"></div></div>
+        </section>
+
+        <!-- INSIGHTS -->
+        <section class="page-section" id="content-insights">
+          <div class="page-loader"><div class="loader-ring"></div></div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section class="page-section" id="content-settings">
+          <div class="page-loader"><div class="loader-ring"></div></div>
+        </section>
+
+      </main>
+
+    </div><!-- /main-col -->
+
+  </div><!-- /app-layout -->
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ═══ SCRIPTS ══════════════════════════════════════════ -->
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script src="js/home.js"></script>
+  <script src="js/habits.js"></script>
+  <script src="js/calendar.js"></script>
+  <script src="js/rewards.js"></script>
+  <script src="js/shop.js"></script>
+  <script src="js/insights.js"></script>
+  <script src="js/settings.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

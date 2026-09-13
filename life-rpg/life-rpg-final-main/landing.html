@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Life RPG — Turn Your Habits Into a Life RPG</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+  <link rel="stylesheet" href="css/auth.css">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    /* ── Landing Page Specific Enhancements ────────────────── */
+    body {
+      overflow-x: hidden;
+      overflow-y: auto;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .landing-header {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 48px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .landing-nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-nav-signin {
+      color: var(--text-primary);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+      padding: 8px 18px;
+      border-radius: var(--radius-sm);
+      transition: all .2s;
+    }
+    .btn-nav-signin:hover {
+      background: rgba(255,255,255,.08);
+      color: var(--teal);
+    }
+
+    .landing-main {
+      position: relative;
+      z-index: 5;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px 24px 60px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .hero-section {
+      text-align: left;
+      padding: 40px 16px 60px;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    .hero-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .hero-content {
+      flex: 1 1 420px;
+      min-width: 320px;
+      max-width: 520px;
+    }
+
+    .hero-content .hero-subheadline {
+      margin: 0 0 36px;
+    }
+
+    .hero-visual {
+      flex: 1 1 450px;
+      min-width: 300px;
+      max-width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      position: relative;
+      margin-right: -20px;
+    }
+
+    .hero-image {
+      width: 100%;
+      max-width: 750px;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 0 75px rgba(0,212,200,.45)) drop-shadow(0 0 30px rgba(0,212,200,.3));
+      position: relative;
+      z-index: 2;
+    }
+
+    @media (max-width: 900px) {
+      .hero-inner {
+        flex-direction: column;
+        text-align: center;
+        gap: 36px;
+      }
+      .hero-content {
+        text-align: center;
+        max-width: 100%;
+      }
+      .hero-ctas {
+        justify-content: center;
+      }
+      .hero-visual {
+        width: 100%;
+        max-width: 520px;
+        justify-content: center;
+        margin-right: 0;
+      }
+      .hero-image {
+        max-width: 520px;
+        filter: drop-shadow(0 0 50px rgba(0,212,200,.4));
+      }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,212,200,.1);
+      border: 1px solid rgba(0,212,200,.3);
+      color: var(--teal-light);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 6px 20px;
+      border-radius: 999px;
+      margin-bottom: 24px;
+      box-shadow: 0 0 20px rgba(0,212,200,.15);
+    }
+
+    .hero-badge i {
+      font-size: 12px;
+    }
+
+    .hero-headline {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(34px, 5.5vw, 56px);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 20px;
+      letter-spacing: -.02em;
+      background: linear-gradient(135deg, #ffffff 30%, var(--teal-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subheadline {
+      font-size: clamp(14px, 1.7vw, 16px);
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 640px;
+      margin: 0 auto 36px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-cta-primary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #f4c430 0%, #d4a017 100%);
+      color: #060e1a;
+      font-weight: 700;
+      font-size: 15px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 24px rgba(244,196,48,.45);
+      transition: all .25s ease;
+    }
+    .btn-cta-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 32px rgba(244,196,48,.6);
+    }
+
+    .btn-cta-demo {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 14px 28px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.15);
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 15px;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: all .25s ease;
+    }
+    .btn-cta-demo:hover {
+      background: rgba(255,255,255,.12);
+      border-color: var(--teal);
+      color: var(--teal-light);
+      transform: translateY(-2px);
+    }
+
+    /* ── How It Works Section ─────────────────────────────── */
+    .how-it-works {
+      width: 100%;
+      margin-top: 20px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(255,255,255,.07);
+      text-align: center;
+    }
+
+    .section-tag {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      color: var(--teal);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(24px, 3.5vw, 34px);
+      font-weight: 700;
+      margin-bottom: 36px;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      text-align: left;
+    }
+
+    .feature-card {
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0,212,200,.3);
+      box-shadow: 0 12px 40px rgba(0,0,0,.5), 0 0 20px rgba(0,212,200,.1);
+    }
+
+    .card-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: rgba(0,212,200,.12);
+      border: 1px solid rgba(0,212,200,.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: var(--teal);
+      margin-bottom: 20px;
+    }
+    .feature-card:nth-child(2) .card-icon {
+      background: rgba(244,196,48,.12);
+      border-color: rgba(244,196,48,.25);
+      color: var(--gold);
+    }
+    .feature-card:nth-child(3) .card-icon {
+      background: rgba(77,232,224,.12);
+      border-color: rgba(77,232,224,.25);
+      color: var(--teal-light);
+    }
+
+    .card-title {
+      font-size: 19px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--text-primary);
+    }
+
+    .card-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    /* ── Full-Width Detail Boxes ──────────────────────────── */
+    .detail-boxes-list {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-top: 36px;
+      width: 100%;
+    }
+
+    .detail-box-full {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      padding: 48px 40px;
+      margin-bottom: 24px;
+      background: var(--glass);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+      text-align: left;
+      transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .detail-box-full:last-child {
+      margin-bottom: 0;
+    }
+
+    .detail-box-full:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0,212,200,.3);
+      box-shadow: 0 12px 40px rgba(0,0,0,.5), 0 0 20px rgba(0,212,200,.1);
+    }
+
+    .detail-box-full.reverse {
+      flex-direction: row-reverse;
+    }
+
+    .detail-box-content {
+      flex: 1;
+    }
+
+    .detail-box-title {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: clamp(22px, 2.6vw, 28px);
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text-primary);
+    }
+
+    .detail-box-desc {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    .detail-box-icon {
+      flex-shrink: 0;
+      width: 68px;
+      height: 68px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      background: rgba(0,212,200,.12);
+      border: 1px solid rgba(0,212,200,.25);
+      color: var(--teal);
+    }
+
+    .detail-box-icon.icon-gold {
+      background: rgba(244,196,48,.12);
+      border-color: rgba(244,196,48,.25);
+      color: var(--gold);
+    }
+
+    .detail-box-icon.icon-teal-light {
+      background: rgba(77,232,224,.12);
+      border-color: rgba(77,232,224,.25);
+      color: var(--teal-light);
+    }
+
+    @media (max-width: 768px) {
+      .detail-box-full,
+      .detail-box-full.reverse {
+        flex-direction: column;
+        text-align: center;
+        gap: 24px;
+        padding: 36px 24px;
+      }
+      .detail-box-title,
+      .detail-box-desc {
+        text-align: center;
+      }
+    }
+
+    /* ── Footer ───────────────────────────────────────────── */
+    .landing-footer {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 32px 24px;
+      color: var(--text-muted);
+      font-size: 13px;
+      border-top: 1px solid rgba(255,255,255,.05);
+      background: rgba(6,14,26,.6);
+      backdrop-filter: blur(8px);
+    }
+
+    .landing-footer span {
+      color: var(--teal);
+      font-weight: 600;
+    }
+
+    @media (max-width: 640px) {
+      .landing-header { padding: 20px; }
+      .hero-section { padding: 20px 0 40px; }
+      .hero-ctas { flex-direction: column; width: 100%; }
+      .btn-cta-primary, .btn-cta-demo { width: 100%; }
+      .hero-visual { max-width: 100%; }
+      .hero-image {
+        max-width: 100%;
+        filter: drop-shadow(0 0 35px rgba(0,212,200,.35));
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ocean Background -->
+  <div class="ocean-scene">
+    <div class="rays" id="landing-rays"></div>
+    <div class="bubbles" id="landing-bubbles"></div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="landing-header">
+    <a href="landing.html" class="auth-logo" style="text-decoration:none;color:inherit;">
+      <img src="assets/logo.png" alt="Life RPG" class="auth-logo-icon">
+      <div class="auth-logo-text">
+        <h1 style="font-family:var(--font-heading);font-weight:800;letter-spacing:-0.01em;"><span style="color:#ffffff;">Life</span> <span style="color:var(--teal-light);">RPG</span></h1>
+        <p>Small Steps · Big Changes</p>
+      </div>
+    </a>
+
+    <div class="landing-nav-actions">
+      <a href="index.html" class="btn-nav-signin" id="nav-signin-link">Sign In</a>
+      <a href="index.html" class="btn-cta-primary" style="padding: 9px 20px; font-size: 13px;">Get Started</a>
+    </div>
+  </header>
+
+  <!-- Main Landing Content -->
+  <main class="landing-main">
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-inner">
+        <div class="hero-content">
+          <div class="hero-badge">
+            <i class="fa-solid fa-gamepad"></i> Level Up Your Daily Routine
+          </div>
+          <h1 class="hero-headline">Turn Your Habits Into a <span style="font-family:var(--font-heading);font-weight:800;letter-spacing:-0.01em;-webkit-text-fill-color:initial;display:inline;"><span style="color:#ffffff;-webkit-text-fill-color:#ffffff;">Life</span> <span style="color:var(--teal-light);-webkit-text-fill-color:var(--teal-light);">RPG</span></span></h1>
+          <p class="hero-subheadline">Track habits, build streaks, and unlock deep insights in a calming deep-sea world of personal growth.</p>
+          <div class="hero-ctas">
+            <a href="index.html" class="btn-cta-primary" id="btn-hero-start">
+              Get Started <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <img src="assets/hero-image.png" alt="Life RPG hero visual" class="hero-image">
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+      <p class="section-tag">HOW IT WORKS</p>
+      <h2 class="section-title">Three Simple Steps to Master Your Routine</h2>
+
+      <div class="cards-grid">
+        <!-- Card 1 -->
+        <div class="feature-card">
+          <div class="card-icon">
+            <i class="fa-solid fa-list-check"></i>
+          </div>
+          <h3 class="card-title">Track Your Habits</h3>
+          <p class="card-desc">Log your daily routines with a single click and keep complete control over your daily self-improvement goals.</p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="feature-card">
+          <div class="card-icon">
+            <i class="fa-solid fa-fire"></i>
+          </div>
+          <h3 class="card-title">Build Your Streak</h3>
+          <p class="card-desc">Stay consistent day after day to build momentum, multiply your streaks, and unlock special badges and star shells.</p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="feature-card">
+          <div class="card-icon">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+          <h3 class="card-title">See Your Progress</h3>
+          <p class="card-desc">Visualize your growth with comprehensive analytics, completion charts, and monthly habit calendars.</p>
+        </div>
+      </div>
+
+      <!-- Full-Width Detail Boxes -->
+      <div class="detail-boxes-list">
+        <!-- Box 1: Text Left, Icon Right -->
+        <div class="detail-box-full">
+          <div class="detail-box-content">
+            <h3 class="detail-box-title">Why <span style="font-family:var(--font-heading);font-weight:800;letter-spacing:-0.01em;"><span style="color:#ffffff;">Life</span> <span style="color:var(--teal-light);">RPG</span></span> Works</h3>
+            <p class="detail-box-desc">Traditional habit trackers feel like chores. Life RPG borrows what makes games addictive — visible progress, streak momentum, and small wins that compound — and applies it to your real daily routines. No cheating your own stats: every action is logged and verified.</p>
+          </div>
+          <div class="detail-box-icon">
+            <i class="fa-solid fa-gamepad"></i>
+          </div>
+        </div>
+
+        <!-- Box 2: Icon Left, Text Right (Reversed) -->
+        <div class="detail-box-full reverse">
+          <div class="detail-box-content">
+            <h3 class="detail-box-title">Built for Consistency, Not Perfection</h3>
+            <p class="detail-box-desc">Missing a day doesn't erase your progress. Life RPG's streak system rewards showing up more often than it punishes an off day, so you build a sustainable routine instead of an all-or-nothing cycle that burns out in a week.</p>
+          </div>
+          <div class="detail-box-icon icon-gold">
+            <i class="fa-solid fa-seedling"></i>
+          </div>
+        </div>
+
+        <!-- Box 3: Text Left, Icon Right -->
+        <div class="detail-box-full">
+          <div class="detail-box-content">
+            <h3 class="detail-box-title">Your Data, Your Ocean</h3>
+            <p class="detail-box-desc">Every habit you track, every streak you build, and every insight you unlock is stored securely under your own account. Log in from anywhere and pick up exactly where you left off.</p>
+          </div>
+          <div class="detail-box-icon icon-teal-light">
+            <i class="fa-solid fa-water"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="landing-footer">
+    <span style="font-family:var(--font-heading);font-weight:800;letter-spacing:-0.01em;"><span style="color:#ffffff;">Life</span> <span style="color:var(--teal-light);">RPG</span></span> — One habit at a time, you're building a better you 🌊
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/config.js"></script>
+  <script src="js/db.js"></script>
+  <script>
+    // ── Ocean bubbles & rays ──────────────────────────────
+    (function buildOceanEffects() {
+      const wrap = document.getElementById('landing-bubbles');
+      if (wrap) {
+        for (let i = 0; i < 24; i++) {
+          const b = document.createElement('div');
+          b.className = 'bubble';
+          const size = 3 + Math.random() * 20;
+          b.style.cssText = `
+            width:${size}px; height:${size}px;
+            left:${Math.random()*100}%;
+            animation-duration:${10+Math.random()*18}s;
+            animation-delay:${-Math.random()*18}s;
+          `;
+          wrap.appendChild(b);
+        }
+      }
+
+      const rays = document.getElementById('landing-rays');
+      if (rays) {
+        [15, 32, 50, 68, 85].forEach((l, i) => {
+          const r = document.createElement('span');
+          r.style.cssText = `position:absolute;top:-10%;left:${l}%;width:${1.5+i*.5}px;height:130%;
+            background:linear-gradient(180deg,rgba(0,212,200,.5) 0%,transparent 75%);
+            transform-origin:top center;opacity:${.25+i*.08};
+            animation:rayWave ${8+i*2}s ease-in-out infinite alternate;
+            --r:${i%2===0?6:-6};`;
+          rays.appendChild(r);
+        });
+      }
+    })();
+
+    // ── Try Demo button handler ───────────────────────────
+    const demoBtn = document.getElementById('btn-hero-demo');
+    if (demoBtn) {
+      demoBtn.addEventListener('click', async () => {
+        demoBtn.disabled = true;
+        const originalHtml = demoBtn.innerHTML;
+        demoBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Launching Demo...';
+        try {
+          await DB.auth.login('demo@habitflow.app', 'demo1234');
+          setTimeout(() => {
+            window.location.href = 'app.html';
+          }, 500);
+        } catch (err) {
+          demoBtn.disabled = false;
+          demoBtn.innerHTML = originalHtml;
+          alert('Could not start demo: ' + (err.message || err));
+        }
+      });
+    }
+
+    // ── Check if already logged in ────────────────────────
+    (async () => {
+      try {
+        const u = await DB.auth.getUser();
+        if (u) {
+          const startBtn = document.getElementById('btn-hero-start');
+          if (startBtn) {
+            startBtn.innerHTML = 'Go to Dashboard <i class="fa-solid fa-arrow-right"></i>';
+            startBtn.href = 'app.html';
+          }
+          const signinNav = document.getElementById('nav-signin-link');
+          if (signinNav) {
+            signinNav.textContent = 'Dashboard';
+            signinNav.href = 'app.html';
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
+
+</body>
+</html>
